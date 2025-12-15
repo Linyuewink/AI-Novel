@@ -665,12 +665,15 @@
                                                                             {{ reply.content }}
                                                                         </div>
                                                                         <div class="flex items-center justify-between text-[10px] text-stone-400 pt-0.5">
-                                                                            <span>{{ reply.time || '刚刚' }} · {{ reply.location || '未知' }}</span>
-                                                                            <div @click.stop="likeReply(index, cIndex, rIndex)"
-                                                                                 class="flex items-center gap-1 cursor-pointer transition-colors select-none"
-                                                                                 :class="reply.isLiked ? 'text-red-500' : 'hover:text-stone-600'">
-                                                                                <svg class="icon w-2.5 h-2.5" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.15L14.17 1 7.59 7.59C7.22 7.95 7 8.48 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
-                                                                                {{ reply.likes || 0 }}
+                                                                            <span>{{ reply.time || '刚刚' }}</span>
+                                                                            <div class="flex items-center gap-3">
+                                                                                <span>IP属地：{{ reply.location || '未知' }}</span>
+                                                                                <div @click.stop="likeReply(index, cIndex, rIndex)"
+                                                                                     class="flex items-center gap-1 cursor-pointer transition-colors select-none"
+                                                                                     :class="reply.isLiked ? 'text-red-500' : 'hover:text-stone-600'">
+                                                                                    <svg class="icon w-2.5 h-2.5" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.15L14.17 1 7.59 7.59C7.22 7.95 7 8.48 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
+                                                                                    {{ reply.likes || 0 }}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -2438,25 +2441,33 @@
 
                         try {
                             const comments = JSON.parse(content);
+                            const locations = ["北京", "上海", "广东", "浙江", "江苏", "四川", "湖北", "湖南", "山东", "河南", "福建", "安徽", "辽宁", "黑龙江", "吉林", "河北", "山西", "陕西", "甘肃", "青海", "江西", "云南", "贵州", "海南", "内蒙古", "广西", "宁夏", "新疆", "西藏", "重庆", "天津", "香港", "澳门", "台湾", "海外"];
+                            const getRandomLocation = () => locations[Math.floor(Math.random() * locations.length)];
+
                             // 补充随机等级和初始化子评论
                             comments.forEach(c => {
                                 c.level = Math.floor(Math.random() * 20) + 1;
+                                if (!c.location) c.location = getRandomLocation();
                                 c.replies = c.replies || []; // 确保 replies 存在
                                 c.replies.forEach(r => {
                                     r.level = Math.floor(Math.random() * 15) + 1;
                                     r.likes = r.likes || Math.floor(Math.random() * 50);
                                     r.isLiked = false;
+                                    if (!r.location) r.location = getRandomLocation();
                                 });
                             });
                             chapter.comments = comments;
                         } catch (parseError) {
                             console.error('JSON 解析失败，尝试回退到文本模式:', parseError);
+                            const locations = ["北京", "上海", "广东", "浙江", "江苏", "四川", "湖北", "湖南", "山东", "河南", "福建", "安徽", "辽宁", "黑龙江", "吉林", "河北", "山西", "陕西", "甘肃", "青海", "江西", "云南", "贵州", "海南", "内蒙古", "广西", "宁夏", "新疆", "西藏", "重庆", "天津", "香港", "澳门", "台湾", "海外"];
+                            const getRandomLocation = () => locations[Math.floor(Math.random() * locations.length)];
+
                             // 回退逻辑：按行分割
                             const lines = content.split('\n').filter(l => l.trim().length > 0);
                             chapter.comments = lines.map(line => ({
                                 username: '热心书友',
                                 content: line.replace(/^\d+[\.、]\s*/, ''),
-                                location: '未知',
+                                location: getRandomLocation(),
                                 likes: Math.floor(Math.random() * 100),
                                 time: '刚刚',
                                 level: Math.floor(Math.random() * 10) + 1,
