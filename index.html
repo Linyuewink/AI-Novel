@@ -632,10 +632,18 @@
                                                             
                                                             <!-- 底部信息 -->
                                                             <div class="flex items-center justify-between text-[10px] text-stone-400 pt-1">
-                                                                <span>{{ comment.time || '刚刚' }}</span>
+                                                                <div class="flex items-center gap-2">
+                                                                    <span>{{ comment.time || '刚刚' }}</span>
+                                                                    <span v-if="comment.isLiked" class="text-stone-500 flex items-center gap-0.5 transition-all">
+                                                                         <svg class="w-3 h-3 text-red-500 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                                                         作者赞过
+                                                                    </span>
+                                                                </div>
                                                                 <div class="flex items-center gap-4">
                                                                     <span>IP属地：{{ comment.location || '未知' }}</span>
-                                                                    <div class="flex items-center gap-1 cursor-pointer hover:text-stone-600 transition-colors">
+                                                                    <div @click.stop="likeComment(index, cIndex)"
+                                                                         class="flex items-center gap-1 cursor-pointer transition-colors select-none"
+                                                                         :class="comment.isLiked ? 'text-red-500' : 'hover:text-stone-600'">
                                                                         <svg class="icon w-3 h-3" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.15L14.17 1 7.59 7.59C7.22 7.95 7 8.48 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
                                                                         {{ comment.likes || 0 }}
                                                                     </div>
@@ -1542,13 +1550,28 @@
                     chapters.value[index].isEditing = false;
                     chapters.value[index].wordCount = chapters.value[index].content.length;
                     saveData();
-                    showToast('章节已保存', 'success');
+                    showToast('章节已保存，正在更新书评...', 'success');
                     // 如果正在搜索，重新搜索以更新结果
                     if (searchQuery.value) performSearch();
+                    
+                    // 重新生成评论
+                    generateChapterComments(index);
                 };
 
                 const cancelChapterEdit = (index) => {
                     chapters.value[index].isEditing = false;
+                };
+
+                const likeComment = (chapterIndex, commentIndex) => {
+                    const comment = chapters.value[chapterIndex].comments[commentIndex];
+                    if (comment.isLiked) {
+                        comment.likes--;
+                        comment.isLiked = false;
+                    } else {
+                        comment.likes++;
+                        comment.isLiked = true;
+                    }
+                    saveData();
                 };
 
                 const toggleAdultMode = () => {
@@ -2646,7 +2669,7 @@ ${charPrompt}
                     clearAll, selectModel, fetchModels, saveData, startGeneration, triggerImport, importBook, importFileInput,
                     renderMarkdown, addCharacter, removeCharacter, confirmDeleteCharacter, openSettings, openReviewModal, startBookReview,
                     startChapterEdit, saveChapterEdit, cancelChapterEdit, renderChapterContent,
-                    toggleAdultMode, toggleChapterComments,
+                    toggleAdultMode, toggleChapterComments, likeComment,
                     searchQuery, replaceQuery, searchResults, currentMatchIndex, hasSearched,
                     performSearch, replaceCurrentMatch, replaceAll, nextMatch, prevMatch, jumpToMatch,
                     tabRefs, tabSliderStyle, onListBeforeEnter, onListEnter, onListLeave,
