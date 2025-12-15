@@ -649,6 +649,33 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+
+                                                            <!-- 楼中楼 (子评论) -->
+                                                            <div v-if="comment.replies && comment.replies.length > 0" class="mt-3 bg-stone-100/50 rounded-lg p-3 space-y-3">
+                                                                <div v-for="(reply, rIndex) in comment.replies" :key="rIndex" class="flex gap-2">
+                                                                    <div class="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center text-stone-500 text-[10px] font-bold shrink-0 overflow-hidden">
+                                                                        <span>{{ reply.username ? reply.username[0] : '?' }}</span>
+                                                                    </div>
+                                                                    <div class="flex-1 space-y-0.5">
+                                                                        <div class="flex items-center gap-2">
+                                                                            <span class="text-xs font-bold text-stone-600">{{ reply.username }}</span>
+                                                                            <span v-if="reply.targetUser" class="text-[10px] text-stone-400">回复 <span class="text-stone-500 font-bold">@{{ reply.targetUser }}</span></span>
+                                                                        </div>
+                                                                        <div class="text-xs text-stone-700 leading-relaxed">
+                                                                            {{ reply.content }}
+                                                                        </div>
+                                                                        <div class="flex items-center justify-between text-[10px] text-stone-400 pt-0.5">
+                                                                            <span>{{ reply.time || '刚刚' }} · {{ reply.location || '未知' }}</span>
+                                                                            <div @click.stop="likeReply(index, cIndex, rIndex)"
+                                                                                 class="flex items-center gap-1 cursor-pointer transition-colors select-none"
+                                                                                 :class="reply.isLiked ? 'text-red-500' : 'hover:text-stone-600'">
+                                                                                <svg class="icon w-2.5 h-2.5" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.15L14.17 1 7.59 7.59C7.22 7.95 7 8.48 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
+                                                                                {{ reply.likes || 0 }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div v-if="chapter.comments && chapter.comments.length === 0 && !chapter.isGeneratingComments" class="text-center text-stone-400 text-xs py-4">
@@ -1574,6 +1601,18 @@
                     saveData();
                 };
 
+                const likeReply = (chapterIndex, commentIndex, replyIndex) => {
+                    const reply = chapters.value[chapterIndex].comments[commentIndex].replies[replyIndex];
+                    if (reply.isLiked) {
+                        reply.likes--;
+                        reply.isLiked = false;
+                    } else {
+                        reply.likes++;
+                        reply.isLiked = true;
+                    }
+                    saveData();
+                };
+
                 const toggleAdultMode = () => {
                     novel.value.isAdultMode = !novel.value.isAdultMode;
                     saveData();
@@ -2367,13 +2406,15 @@
 要求：
 1. 评论风格要多样化：有的催更，有的讨论剧情细节，有的吐槽角色，有的玩梗，有的分析伏笔。
 2. 语气要自然，像真实的网文读者评论。
-3. 请返回一个 JSON 数组，每个对象包含以下字段：
+3. **部分评论（约40%）需要包含子评论（楼中楼），模拟读者之间的互动、争论或补充，热评的楼中楼应该更多。**
+4. 请返回一个 JSON 数组，每个对象包含以下字段：
    - username: 读者昵称（起一些有网文特色的名字）
    - content: 评论内容
-   - location: IP属地（中国省份或城市）
+   - location: IP属地（中国省份或直辖城市）
    - likes: 点赞数（随机整数，0-1000）
    - time: 评论时间（如"1分钟前", "1小时前"）
-4. 严禁输出任何 Markdown 代码块标记（如 \`\`\`json），直接输出纯 JSON 字符串。`;
+   - replies: [可选] 子评论数组，包含字段同上，额外增加 targetUser (回复对象用户名，可选)
+5. 严禁输出任何 Markdown 代码块标记（如 \`\`\`json），直接输出纯 JSON 字符串。`;
 
                     try {
                         const response = await fetch(`${settings.value.apiUrl}/chat/completions`, {
@@ -2397,11 +2438,15 @@
 
                         try {
                             const comments = JSON.parse(content);
-                            // 补充随机等级
+                            // 补充随机等级和初始化子评论
                             comments.forEach(c => {
                                 c.level = Math.floor(Math.random() * 20) + 1;
-                                // 简单的头像生成逻辑（使用 UI Avatars 服务或随机颜色）
-                                // 这里为了简单，前端直接用首字母
+                                c.replies = c.replies || []; // 确保 replies 存在
+                                c.replies.forEach(r => {
+                                    r.level = Math.floor(Math.random() * 15) + 1;
+                                    r.likes = r.likes || Math.floor(Math.random() * 50);
+                                    r.isLiked = false;
+                                });
                             });
                             chapter.comments = comments;
                         } catch (parseError) {
@@ -2414,7 +2459,8 @@
                                 location: '未知',
                                 likes: Math.floor(Math.random() * 100),
                                 time: '刚刚',
-                                level: Math.floor(Math.random() * 10) + 1
+                                level: Math.floor(Math.random() * 10) + 1,
+                                replies: []
                             }));
                         }
                         
@@ -2669,7 +2715,7 @@ ${charPrompt}
                     clearAll, selectModel, fetchModels, saveData, startGeneration, triggerImport, importBook, importFileInput,
                     renderMarkdown, addCharacter, removeCharacter, confirmDeleteCharacter, openSettings, openReviewModal, startBookReview,
                     startChapterEdit, saveChapterEdit, cancelChapterEdit, renderChapterContent,
-                    toggleAdultMode, toggleChapterComments, likeComment,
+                    toggleAdultMode, toggleChapterComments, likeComment, likeReply,
                     searchQuery, replaceQuery, searchResults, currentMatchIndex, hasSearched,
                     performSearch, replaceCurrentMatch, replaceAll, nextMatch, prevMatch, jumpToMatch,
                     tabRefs, tabSliderStyle, onListBeforeEnter, onListEnter, onListLeave,
