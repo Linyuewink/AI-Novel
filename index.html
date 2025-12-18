@@ -1464,7 +1464,7 @@
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.value.apiKey}` },
                                 body: JSON.stringify({
-                                    model: 'gemini-2.5-flash-thinking', // 强制使用指定模型
+                                    model: 'gemini-3-flash-preview', // 强制使用指定模型
                                     messages: [
                                         { role: "system", content: persona.systemPrompt },
                                         { role: "user", content: fullContent }
@@ -2424,7 +2424,7 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.value.apiKey}` },
                             body: JSON.stringify({
-                                model: 'gemini-2.5-flash-thinking',
+                                model: 'gemini-3-flash-preview',
                                 messages: [
                                     { role: "user", content: fullContent + "\n\n" + prompt }
                                 ],
