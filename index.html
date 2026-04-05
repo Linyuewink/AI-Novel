@@ -1166,7 +1166,7 @@
                 const currentBookId = ref('');
                 const globalSettings = ref({
                     apiUrl: 'https://sta1n.zeabur.app/v1',
-                    apiKey: 'sk-e11TwTdcibEs6DsgXWCiLJ1LaTu6RgpJwJlDbU6VOflA5gLn'
+                    apiKey: 'sk-B8diSFVLKaOu1CbmFMrunTR2ExRD6C4BUm143TfNEtY9nWRU'
                 });
 
                 const showKey = ref(false);
@@ -1231,8 +1231,8 @@
                 const chapters = ref([]);
                 const settings = ref({
                     apiUrl: 'https://sta1n.zeabur.app/v1',
-                    apiKey: 'sk-e11TwTdcibEs6DsgXWCiLJ1LaTu6RgpJwJlDbU6VOflA5gLn',
-                    model: 'gemini-3-pro-preview-maxthinking' // 更新默认模型
+                    apiKey: 'sk-B8diSFVLKaOu1CbmFMrunTR2ExRD6C4BUm143TfNEtY9nWRU',
+                    model: 'gemini-3.1-pro-preview-high' // 更新默认模型
                 });
 
                 // 计算属性
@@ -2227,7 +2227,7 @@
                         novel: { title: title, worldView: '', negativePrompt: '', isAdultMode: false },
                         characters: [],
                         chapters: [],
-                        localSettings: { model: 'gemini-3-pro-preview-thinking' },
+                        localSettings: { model: 'gemini-3.1-pro-preview-high' },
                         wordCountTarget: 2500,
                         wordCount: 0
                     };
@@ -2263,7 +2263,7 @@
                     settings.value = {
                         apiUrl: globalSettings.value.apiUrl,
                         apiKey: globalSettings.value.apiKey,
-                        model: book.localSettings?.model || 'gemini-3-pro-preview-thinking'
+                        model: book.localSettings?.model || 'gemini-3.1-pro-preview-high'
                     };
                     
                     wordCountTarget.value = book.wordCountTarget || 2500;
@@ -2373,7 +2373,7 @@
                                 novel: oldData.novel || { title: '', worldView: '', negativePrompt: '', isAdultMode: false },
                                 characters: oldData.characters || [],
                                 chapters: (oldData.chapters || []).map(c => ({ ...c, isExpanded: false, showSummary: false, contentHeight: 0, comments: [], isGeneratingComments: false, showComments: false })),
-                                localSettings: { model: oldData.settings?.model || 'gemini-3-pro-preview-thinking' },
+                                localSettings: { model: oldData.settings?.model || 'gemini-3.1-pro-preview-high' },
                                 wordCountTarget: oldData.wordCountTarget || 2500,
                                 wordCount: (oldData.chapters || []).reduce((acc, cur) => acc + (cur.wordCount || 0), 0)
                             };
