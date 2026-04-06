@@ -967,9 +967,12 @@
         </div>
 
         <!-- 删除角色确认弹窗 -->
+        <transition name="fade">
+            <div v-if="showDeleteCharModal" class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-[60]"></div>
+        </transition>
         <transition name="pop">
-            <div v-if="showDeleteCharModal" class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-[60] flex items-center justify-center p-4" @click.self="showDeleteCharModal = false">
-                <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 space-y-6 animate-pop-in">
+            <div v-if="showDeleteCharModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4" @mousedown.self="showDeleteCharModal = false">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 space-y-6">
                     <div class="text-center space-y-2">
                         <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg class="icon w-6 h-6" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -986,9 +989,12 @@
         </transition>
 
         <!-- 通用确认弹窗 -->
+        <transition name="fade">
+            <div v-if="showConfirmModal" class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-[70]"></div>
+        </transition>
         <transition name="pop">
-            <div v-if="showConfirmModal" class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-[70] flex items-center justify-center p-4" @click.self="cancelConfirm">
-                <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 space-y-6 animate-pop-in">
+            <div v-if="showConfirmModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4" @mousedown.self="cancelConfirm">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 space-y-6">
                     <div class="text-center space-y-2">
                         <div v-if="confirmModalConfig.icon" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" :class="confirmModalConfig.iconBg">
                             <svg class="icon w-6 h-6" :class="confirmModalConfig.iconColor" viewBox="0 0 24 24" v-html="confirmModalConfig.icon"></svg>
@@ -1005,9 +1011,12 @@
         </transition>
 
         <!-- 设置弹窗 (移动端全屏适配) -->
+        <transition name="fade">
+            <div v-if="showSettings" class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-50"></div>
+        </transition>
         <transition name="pop">
-            <div v-if="showSettings" class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="showSettings = false">
-                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] animate-pop-in">
+            <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="showSettings = false">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
                     <div class="px-6 py-4 border-b border-stone-100 flex justify-between items-center bg-stone-50">
                         <h3 class="text-lg font-bold text-stone-800 flex items-center gap-2">
                             <svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg> 设置
@@ -1049,6 +1058,16 @@
                                 </button>
                             </div>
                             
+                            <!-- 配置目标选择器 -->
+                            <div class="flex gap-2 bg-stone-100 p-1 rounded-lg">
+                                <button v-for="target in modelTargets" :key="target.id"
+                                        @click="currentModelTarget = target.id"
+                                        class="flex-1 py-1.5 text-xs rounded-md transition-all font-bold text-center"
+                                        :class="currentModelTarget === target.id ? 'bg-white text-stone-800 shadow-sm' : 'text-stone-500 hover:text-stone-700'">
+                                    {{ target.name }}
+                                </button>
+                            </div>
+
                             <div class="relative">
                                 <svg class="icon w-4 h-4 absolute left-3 top-2.5 text-stone-400" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                                 <input v-model="modelSearch" placeholder="搜索模型..." class="w-full pl-9 border border-stone-200 rounded px-3 py-2 text-sm mb-2 focus:ring-2 focus:ring-stone-200 focus:border-stone-400 outline-none bg-stone-50">
@@ -1057,9 +1076,9 @@
                                     <div v-for="model in filteredModels" :key="model.id" 
                                          @click="selectModel(model.id)"
                                          class="px-4 py-2 text-sm cursor-pointer hover:bg-stone-100 flex justify-between items-center transition-colors border-b border-stone-50 last:border-0"
-                                         :class="{'bg-stone-100 font-bold text-stone-800': settings.model === model.id, 'text-stone-600': settings.model !== model.id}">
+                                         :class="{'bg-stone-100 font-bold text-stone-800': settings[currentModelTarget] === model.id, 'text-stone-600': settings[currentModelTarget] !== model.id}">
                                         <span>{{ model.id }}</span>
-                                        <svg v-if="settings.model === model.id" class="icon w-4 h-4 text-green-600" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                        <svg v-if="settings[currentModelTarget] === model.id" class="icon w-4 h-4 text-green-600" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                                     </div>
                                     <div v-if="filteredModels.length === 0" class="px-4 py-8 text-sm text-stone-400 text-center flex flex-col items-center gap-2">
                                         <svg class="icon w-8 h-8 text-stone-300" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.59-13L12 10.59 8.41 7 7 8.41 10.59 12 7 15.59 8.41 17 12 13.41 15.59 17 17 15.59 13.41 12 17 8.41z"/></svg>
@@ -1067,7 +1086,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-2 text-xs text-stone-500 flex justify-between">
-                                    <span>当前: <span class="font-mono font-bold text-stone-700">{{ settings.model }}</span></span>
+                                    <span>当前: <span class="font-mono font-bold text-stone-700">{{ settings[currentModelTarget] || '未设置' }}</span></span>
                                     <span class="text-stone-300">共 {{ availableModels.length }} 个</span>
                                 </div>
                             </div>
@@ -1082,9 +1101,12 @@
         </transition>
 
         <!-- 导入/导出 弹窗 -->
+        <transition name="fade">
+            <div v-if="showImportExportModal" class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-[60]"></div>
+        </transition>
         <transition name="pop">
-            <div v-if="showImportExportModal" class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-[60] flex items-center justify-center p-4" @click.self="showImportExportModal = false">
-                <div class="bg-white rounded-xl shadow-2xl w-full max-w-xs overflow-hidden p-6 space-y-4 animate-pop-in relative">
+            <div v-if="showImportExportModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4" @mousedown.self="showImportExportModal = false">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-xs overflow-hidden p-6 space-y-4 relative">
                     <button @click="showImportExportModal = false" class="absolute top-3 right-3 text-stone-400 hover:text-stone-600 p-1 rounded-full hover:bg-stone-100 transition-colors">
                         <svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                     </button>
@@ -1165,9 +1187,16 @@
                 const books = ref([]);
                 const currentBookId = ref('');
                 const globalSettings = ref({
-                    apiUrl: 'https://sta1n.zeabur.app/v1',
-                    apiKey: 'sk-B8diSFVLKaOu1CbmFMrunTR2ExRD6C4BUm143TfNEtY9nWRU'
+                    apiUrl: '',
+                    apiKey: ''
                 });
+
+                const currentModelTarget = ref('model');
+                const modelTargets = [
+                    { id: 'model', name: '正文生成' },
+                    { id: 'reviewModel', name: '书评团' },
+                    { id: 'commentModel', name: '评论区' }
+                ];
 
                 const showKey = ref(false);
                 const isGenerating = ref(false);
@@ -1230,9 +1259,11 @@
                 const structuredCharacters = ref([]);
                 const chapters = ref([]);
                 const settings = ref({
-                    apiUrl: 'https://sta1n.zeabur.app/v1',
-                    apiKey: 'sk-B8diSFVLKaOu1CbmFMrunTR2ExRD6C4BUm143TfNEtY9nWRU',
-                    model: 'gemini-3.1-pro-preview-high' // 更新默认模型
+                    apiUrl: '',
+                    apiKey: '',
+                    model: '',
+                    reviewModel: '',
+                    commentModel: ''
                 });
 
                 // 计算属性
@@ -1464,7 +1495,7 @@
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.value.apiKey}` },
                                 body: JSON.stringify({
-                                    model: 'gemini-3-flash-preview', // 强制使用指定模型
+                                    model: settings.value.reviewModel || settings.value.model || 'gemini-3-flash-preview',
                                     messages: [
                                         { role: "system", content: persona.systemPrompt },
                                         { role: "user", content: fullContent }
@@ -2160,7 +2191,7 @@
                    });
                 };
 
-                const selectModel = (id) => { settings.value.model = id; saveData(); };
+                const selectModel = (id) => { settings.value[currentModelTarget.value] = id; saveData(); };
 
                 const fetchModels = async () => {
                     if (!settings.value.apiKey) {
@@ -2197,7 +2228,11 @@
                                 novel: JSON.parse(JSON.stringify(novel.value)),
                                 characters: JSON.parse(JSON.stringify(structuredCharacters.value)),
                                 chapters: JSON.parse(JSON.stringify(chapters.value)),
-                                localSettings: { model: settings.value.model },
+                                localSettings: { 
+                                    model: settings.value.model,
+                                    reviewModel: settings.value.reviewModel,
+                                    commentModel: settings.value.commentModel
+                                },
                                 wordCountTarget: wordCountTarget.value,
                                 wordCount: totalWordCount.value
                             };
@@ -2227,7 +2262,7 @@
                         novel: { title: title, worldView: '', negativePrompt: '', isAdultMode: false },
                         characters: [],
                         chapters: [],
-                        localSettings: { model: 'gemini-3.1-pro-preview-high' },
+                        localSettings: { model: '', reviewModel: '', commentModel: '' },
                         wordCountTarget: 2500,
                         wordCount: 0
                     };
@@ -2263,7 +2298,9 @@
                     settings.value = {
                         apiUrl: globalSettings.value.apiUrl,
                         apiKey: globalSettings.value.apiKey,
-                        model: book.localSettings?.model || 'gemini-3.1-pro-preview-high'
+                        model: book.localSettings?.model || '',
+                        reviewModel: book.localSettings?.reviewModel || '',
+                        commentModel: book.localSettings?.commentModel || ''
                     };
                     
                     wordCountTarget.value = book.wordCountTarget || 2500;
@@ -2373,7 +2410,11 @@
                                 novel: oldData.novel || { title: '', worldView: '', negativePrompt: '', isAdultMode: false },
                                 characters: oldData.characters || [],
                                 chapters: (oldData.chapters || []).map(c => ({ ...c, isExpanded: false, showSummary: false, contentHeight: 0, comments: [], isGeneratingComments: false, showComments: false })),
-                                localSettings: { model: oldData.settings?.model || 'gemini-3.1-pro-preview-high' },
+                                localSettings: { 
+                                    model: oldData.settings?.model || '',
+                                    reviewModel: '',
+                                    commentModel: ''
+                                },
                                 wordCountTarget: oldData.wordCountTarget || 2500,
                                 wordCount: (oldData.chapters || []).reduce((acc, cur) => acc + (cur.wordCount || 0), 0)
                             };
@@ -2424,7 +2465,7 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${settings.value.apiKey}` },
                             body: JSON.stringify({
-                                model: 'gemini-3-flash-preview',
+                                model: settings.value.commentModel || settings.value.model || 'gemini-3-flash-preview',
                                 messages: [
                                     { role: "user", content: fullContent + "\n\n" + prompt }
                                 ],
@@ -2718,6 +2759,7 @@ ${charPrompt}
                     showSettings, showDeleteCharModal, showKey, isGenerating, isLoadingModels, mobileSidebarOpen, isMobile, showImportExportModal,
                     showReviewModal, isReviewing, hasReviewed, reviews, reviewStatus, currentReviewTab, reviewTabs,
                     novel, structuredCharacters, chapters, settings, streamContent, nextChapterPrompt,
+                    currentModelTarget, modelTargets,
                     generateCount, modelSearch, filteredModels, availableModels, wordCountTarget,
                     showConfirmModal, confirmModalConfig, executeConfirm, cancelConfirm, toast, showToast,
                     totalWordCount, currentChapterIndex, mainScroll, bookshelfList, currentTab, tabs,
